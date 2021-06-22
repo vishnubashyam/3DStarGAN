@@ -34,20 +34,20 @@ def main(args):
     loaders = Munch(src=get_train_loader(csv, root='/home/bashyamv/Research/Data/Data_Lifespan/Data/',
                                                     which='source',
                                                     img_size=182,
-                                                    batch_size=1,
+                                                    batch_size=2,
                                                     prob=0,
-                                                    num_workers=5),
+                                                    num_workers=20),
                             ref=get_train_loader(csv, root='/home/bashyamv/Research/Data/Data_Lifespan/Data/',
                                                     which='reference',
                                                     img_size=182,
                                                     batch_size=1,
                                                     prob=0,
-                                                    num_workers=5),
+                                                    num_workers=20),
                             val=get_test_loader(csv, root='/home/bashyamv/Research/Data/Data_Lifespan/Data/',
                                                     img_size=182,
                                                     batch_size=1,
                                                     shuffle=True,
-                                                    num_workers=5))
+                                                    num_workers=20))
 
     solver.train(loaders= loaders)
 
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
 
     # model arguments
-    parser.add_argument('--img_size', type=int, default=182,
+    parser.add_argument('--img_size', type=int, default=128,
                         help='Image resolution')
     parser.add_argument('--num_domains', type=int, default=1,
                         help='Number of domains')
@@ -92,7 +92,7 @@ if __name__ == '__main__':
                         help='Number of total iterations')
     parser.add_argument('--resume_iter', type=int, default=0,
                         help='Iterations to resume training/testing')
-    parser.add_argument('--batch_size', type=int, default=1,
+    parser.add_argument('--batch_size', type=int, default=2,
                         help='Batch size for training')
     parser.add_argument('--val_batch_size', type=int, default=1,
                         help='Batch size for validation')

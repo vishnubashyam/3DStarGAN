@@ -19,7 +19,7 @@ class Solver(nn.Module):
         super().__init__()        
         self.args = args
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+        print(self.device)
         self.nets, self.nets_ema = build_model(args)
         # below setattrs are to make networks be children of Solver, e.g., for self.to(self.device)
         for name, module in self.nets.items():
@@ -35,9 +35,15 @@ class Solver(nn.Module):
                     lr=args.f_lr if net == 'mapping_network' else args.lr,
                     betas=[args.beta1, args.beta2],
                     weight_decay=args.weight_decay)
-        self.to(self.device)
+        # self = nn.DataParallel(self, device_ids=[0,1])
+        # self.to(self.device)
+
         for name, network in self.named_children():
             network.apply(he_init)
+            network = nn.DataParallel(network, device_ids=[0,1])
+            network.to(self.device)
+        # self.to(self.device)
+
 
     def _reset_grad(self):
         for optim in self.optims.values():
@@ -173,7 +179,7 @@ def compute_g_loss(nets, args, x_real, y_org, y_trg, z_trgs=None, x_refs=None, m
     loss_cyc = torch.mean(torch.abs(x_rec - x_real))
 
     empty_header = nib.Nifti1Header()
-    new_image = nib.Nifti1Image(x_rec.cpu().detach().numpy().reshape(182,182,182), affine=np.eye(4))
+    new_image = nib.Nifti1Image(x_rec.cpu().detach().numpy()[0].reshape(128,128,128), affine=np.eye(4))
     nib.save(new_image, f'output.nii.gz')
 
 

@@ -28,7 +28,7 @@ class Dataset_3d(torch.utils.data.Dataset):
         labels = self.list_IDs['Domain'][index]
         # zeros = np.zeros((1,218,218,218))
 
-        img = nib.load(self.data_dir + str(subject_id)).get_fdata().reshape(1,182,218,182)[:,:,:182, :]
+        img = nib.load(self.data_dir + str(subject_id)).get_fdata().reshape(-1,182,218,182)[:, 25:153,25:153,25:153]
         # zeros[:, :182, :218, :182] = img
         # img = zeros
         Y = np.array(labels, dtype = np.float32)
@@ -71,9 +71,9 @@ class ReferenceDataset(data.Dataset):
         label = self.targets[index]
 
 
-        img = nib.load(self.data_dir + str(fname)).get_fdata().reshape(1,182,218,182)[:,:,:182, :]
+        img = nib.load(self.data_dir + str(fname)).get_fdata().reshape(-1,182,218,182)[:,25:153,25:153,25:153]
 
-        img2 = nib.load(self.data_dir + str(fname2)).get_fdata().reshape(1,182,218,182)[:,:,:182, :]
+        img2 = nib.load(self.data_dir + str(fname2)).get_fdata().reshape(-1,182,218,182)[:,25:153,25:153,25:153]
 
         img = torch.from_numpy(img).float()
         img = (img/ img.max())

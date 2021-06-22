@@ -129,7 +129,7 @@ class AdainResBlk(nn.Module):
 class Generator(nn.Module):
     def __init__(self, img_size=256, style_dim=64, max_conv_dim=512):
         super().__init__()
-        dim_in = 4
+        dim_in = 8
         self.img_size = img_size
         self.from_rgb = nn.Conv3d(1, dim_in, 3, 1, 1) 
         self.encode = nn.ModuleList()
@@ -137,7 +137,7 @@ class Generator(nn.Module):
         self.to_rgb = nn.Sequential(
             nn.InstanceNorm3d(dim_in, affine=True),
             nn.LeakyReLU(0.2),
-            nn.Conv3d(dim_in, 1, 1, 1, 3))## Padding added to fix output size - need to figure out why output img size is wrong
+            nn.Conv3d(dim_in, 1, 1, 1, 0))## Padding added to fix output size - need to figure out why output img size is wrong
 
         # down/up-sampling blocks
         repeat_num = int(np.log2(img_size)) - 4
@@ -159,11 +159,17 @@ class Generator(nn.Module):
     def forward(self, x, s, masks=None):
         x = self.from_rgb(x)
         cache = {}
+        identity_connection = []
         for block in self.encode:
             if (masks is not None) and (x.size(2) in [32, 64, 128]):
                 cache[x.size(2)] = x
             x = block(x)
-        for block in self.decode:
+            identity_connection.insert(0, x)
+        i=0
+        for block, identity in zip(self.decode, identity_connection):
+            if i>2:
+                x = torch.add(x, identity)
+            i+=1
             x = block(x, s)
             if (masks is not None) and (x.size(2) in [32, 64, 128]):
                 mask = masks[0] if x.size(2) in [32] else masks[1]
@@ -224,12 +230,13 @@ class StyleEncoder(nn.Module):
 
         self.unshared = nn.ModuleList()
         for _ in range(num_domains):
-            self.unshared += [nn.Linear(256, style_dim)] ### 864 was hardcoded, originally dim_out, varies as img size varies
+            self.unshared += [nn.Linear(64, style_dim)] ### 864 was hardcoded, originally dim_out, varies as img size varies
     def forward(self, x, y):
         h = self.shared(x)
         h = h.view(h.size(0), -1)
         out = []
         for layer in self.unshared:
+            # print(h.size())
             out += [layer(h)]
         out = torch.stack(out, dim=1)  # (batch, num_domains, style_dim)
         idx = torch.LongTensor(range(y.size(0))).to(y.device)
