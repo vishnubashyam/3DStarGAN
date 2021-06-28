@@ -25,25 +25,25 @@ def main(args):
     config = configparser.ConfigParser()
     config.read('./config/config.ini')
 
-    csv = pd.read_csv('/home/bashyamv/Research/Data/Data_Lifespan/scanlist.csv', header = None)
-    csv.columns = ['fname']
-    csv["Domain"] = 0
+    csv = pd.read_csv('/home/bashyamv/Research/3DStarGAN/3DStarGAN/train_df_modal.csv')
+    # csv.columns = ['fname']
+    # csv["Domain"] = 0
 
     solver = Solver(args)
 
-    loaders = Munch(src=get_train_loader(csv, root='/home/bashyamv/Research/Data/Data_Lifespan/Data/',
+    loaders = Munch(src=get_train_loader(csv, root='',
                                                     which='source',
                                                     img_size=182,
                                                     batch_size=2,
                                                     prob=0,
                                                     num_workers=20),
-                            ref=get_train_loader(csv, root='/home/bashyamv/Research/Data/Data_Lifespan/Data/',
+                            ref=get_train_loader(csv, root='',
                                                     which='reference',
                                                     img_size=182,
                                                     batch_size=1,
                                                     prob=0,
                                                     num_workers=20),
-                            val=get_test_loader(csv, root='/home/bashyamv/Research/Data/Data_Lifespan/Data/',
+                            val=get_test_loader(csv, root='',
                                                     img_size=182,
                                                     batch_size=1,
                                                     shuffle=True,
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     # model arguments
     parser.add_argument('--img_size', type=int, default=128,
                         help='Image resolution')
-    parser.add_argument('--num_domains', type=int, default=1,
+    parser.add_argument('--num_domains', type=int, default=4,
                         help='Number of domains')
     parser.add_argument('--latent_dim', type=int, default=512,
                         help='Latent vector dimension')
