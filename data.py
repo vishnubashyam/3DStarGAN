@@ -6,11 +6,12 @@ import pandas as pd
 import numpy as np
 import torch
 import cv2
+import ffmpeg
 import PIL
 from munch import Munch
 import os
 import random
-
+import imageio
 from torch.utils.data.sampler import WeightedRandomSampler
 
 
@@ -27,7 +28,7 @@ class Dataset_3d(torch.utils.data.Dataset):
         subject_id = self.list_IDs['fname'][index]
         labels = self.list_IDs['Domain'][index]
         # zeros = np.zeros((1,218,218,218))
-        img = nib.load(self.data_dir + str(subject_id)).get_fdata().reshape(-1,240,240,155)[:, 25:153,25:153,25:153]
+        img = np.load(str(subject_id)).reshape( 128, 128,128, 3).transpose(3,0,1,2)
         # zeros[:, :182, :218, :182] = img
         # img = zeros
         Y = np.array(labels, dtype = np.float32)
@@ -39,7 +40,6 @@ class Dataset_3d(torch.utils.data.Dataset):
         img = torch.from_numpy(img).float()
         img = (img/ img.max())
         Y = torch.from_numpy(Y).float()
-
 
         return img, Y
 
@@ -70,9 +70,9 @@ class ReferenceDataset(data.Dataset):
         label = self.targets[index]
 
 
-        img = nib.load(self.data_dir + str(fname)).get_fdata().reshape(-1,240,240,155)[:,25:153,25:153,25:153]
+        img = np.load(str(fname)).reshape( 128, 128,128, 3).transpose(3,0,1,2)
 
-        img2 = nib.load(self.data_dir + str(fname2)).get_fdata().reshape(-1,240,240,155)[:,25:153,25:153,25:153]
+        img2 = np.load(str(fname2)).reshape( 128, 128,128, 3).transpose(3,0,1,2)
 
         img = torch.from_numpy(img).float()
         img = (img/ img.max())

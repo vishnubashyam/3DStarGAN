@@ -131,13 +131,13 @@ class Generator(nn.Module):
         super().__init__()
         dim_in = 8
         self.img_size = img_size
-        self.from_rgb = nn.Conv3d(1, dim_in, 3, 1, 1) 
+        self.from_rgb = nn.Conv3d(3, dim_in, 3, 1, 1) 
         self.encode = nn.ModuleList()
         self.decode = nn.ModuleList()
         self.to_rgb = nn.Sequential(
             nn.InstanceNorm3d(dim_in, affine=True),
             nn.LeakyReLU(0.2),
-            nn.Conv3d(dim_in, 1, 1, 1, 0))## Padding added to fix output size - need to figure out why output img size is wrong
+            nn.Conv3d(dim_in, 3, 1, 1, 0))## Padding added to fix output size - need to figure out why output img size is wrong
 
         # down/up-sampling blocks
         repeat_num = int(np.log2(img_size)) - 4
@@ -215,7 +215,7 @@ class StyleEncoder(nn.Module):
         super().__init__()
         dim_in = 2**8 // img_size
         blocks = []
-        blocks += [nn.Conv3d(1, dim_in, 3, 1, 1)]
+        blocks += [nn.Conv3d(3, dim_in, 3, 1, 1)]
 
         repeat_num = int(np.log2(img_size)) - 2
         for _ in range(repeat_num):
@@ -249,7 +249,7 @@ class Discriminator(nn.Module):
         super().__init__()
         dim_in = 2**10 // img_size
         blocks = []
-        blocks += [nn.Conv3d(1, dim_in, 3, 1, 1)]
+        blocks += [nn.Conv3d(3, dim_in, 3, 1, 1)]
 
         repeat_num = int(np.log2(img_size)) - 2
         for _ in range(repeat_num):

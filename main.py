@@ -25,9 +25,15 @@ def main(args):
     config = configparser.ConfigParser()
     config.read('./config/config.ini')
 
-    csv = pd.read_csv('/home/bashyamv/Research/3DStarGAN/3DStarGAN/train_df_modal.csv')
+    csv = pd.read_csv('/home/bashyamv/Research/3DStarGAN/3DStarGAN/train_df_video.csv')
+    csv.loc[:,'fname'] = csv.fname.str.replace("Seinfeld_128", "Seinfeld_128/")
     # csv.columns = ['fname']
     # csv["Domain"] = 0
+    csv = csv[csv['fname'] != '/home/bashyamv/Research/Data/Video_Style_Transfer/RickMorty_128/.']
+    csv = csv[csv['fname'] != '/home/bashyamv/Research/Data/Video_Style_Transfer/RickMorty_128/..']
+    csv = csv[csv['fname'] != '/home/bashyamv/Research/Data/Video_Style_Transfer/Seinfeld_128/.']
+    csv = csv[csv['fname'] != '/home/bashyamv/Research/Data/Video_Style_Transfer/Seinfeld_128/..']
+    csv = csv.reset_index(drop=True)
 
     solver = Solver(args)
 
@@ -40,12 +46,12 @@ def main(args):
                             ref=get_train_loader(csv, root='',
                                                     which='reference',
                                                     img_size=182,
-                                                    batch_size=1,
+                                                    batch_size=2,
                                                     prob=0,
                                                     num_workers=20),
                             val=get_test_loader(csv, root='',
                                                     img_size=182,
-                                                    batch_size=1,
+                                                    batch_size=2,
                                                     shuffle=True,
                                                     num_workers=20))
 

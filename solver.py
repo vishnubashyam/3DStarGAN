@@ -12,7 +12,9 @@ from network import build_model
 from data import InputFetcher
 from utils import he_init
 import nibabel as nib
-
+import imageio
+global tag_i
+tag_i=0
 
 class Solver(nn.Module):
     def __init__(self, args):
@@ -178,10 +180,14 @@ def compute_g_loss(nets, args, x_real, y_org, y_trg, z_trgs=None, x_refs=None, m
     x_rec = nets.generator(x_fake, s_org, masks=masks)
     loss_cyc = torch.mean(torch.abs(x_rec - x_real))
 
-    empty_header = nib.Nifti1Header()
-    new_image = nib.Nifti1Image(x_rec.cpu().detach().numpy()[0].reshape(128,128,128), affine=np.eye(4))
-    nib.save(new_image, f'output.nii.gz')
-
+    global tag_i
+    # empty_header = nib.Nifti1Header()
+    if tag_i%50==0:
+        new_image = (x_rec.cpu().detach().numpy()[0]*255).astype(np.uint8).transpose(1,2,3,0)
+        imageio.mimwrite(f'sample_videos/sample{tag_i}.mp4', new_image, fps = 24)
+    tag_i+=1
+    # nib.save(new_image, f'output.nii.gz')
+    
 
     loss = loss_adv + args.lambda_sty * loss_sty \
         - args.lambda_ds * loss_ds + args.lambda_cyc * loss_cyc
