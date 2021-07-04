@@ -27,9 +27,10 @@ class Dataset_3d(torch.utils.data.Dataset):
         subject_id = self.list_IDs['fname'][index]
         labels = self.list_IDs['Domain'][index]
         # zeros = np.zeros((1,218,218,218))
-        img = nib.load(self.data_dir + str(subject_id)).get_fdata().reshape(-1,240,240,155)[:, 25:153,25:153,25:153]
-        # zeros[:, :182, :218, :182] = img
-        # img = zeros
+        img = nib.load(self.data_dir + str(subject_id)).get_fdata().reshape(-1,240,240,155)
+        temp = np.zeros((1,256,256,256))
+        temp[:, 10:-6, 10:-6,50:-51] = img
+        img = temp
         Y = np.array(labels, dtype = np.float32)
 
 
@@ -70,9 +71,15 @@ class ReferenceDataset(data.Dataset):
         label = self.targets[index]
 
 
-        img = nib.load(self.data_dir + str(fname)).get_fdata().reshape(-1,240,240,155)[:,25:153,25:153,25:153]
+        img = nib.load(self.data_dir + str(fname)).get_fdata().reshape(-1,240,240,155)
+        temp = np.zeros((1,256,256,256))
+        temp[:, 10:-6, 10:-6,50:-51] = img
+        img = temp
 
-        img2 = nib.load(self.data_dir + str(fname2)).get_fdata().reshape(-1,240,240,155)[:,25:153,25:153,25:153]
+        img2 = nib.load(self.data_dir + str(fname2)).get_fdata().reshape(-1,240,240,155)
+        temp2 = np.zeros((1,256,256,256))
+        temp2[:, 10:-6, 10:-6,50:-51]= img2
+        img2 = temp2
 
         img = torch.from_numpy(img).float()
         img = (img/ img.max())

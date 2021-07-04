@@ -34,7 +34,7 @@ def main(args):
     loaders = Munch(src=get_train_loader(csv, root='',
                                                     which='source',
                                                     img_size=182,
-                                                    batch_size=2,
+                                                    batch_size=1,
                                                     prob=0,
                                                     num_workers=20),
                             ref=get_train_loader(csv, root='',
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
 
     # model arguments
-    parser.add_argument('--img_size', type=int, default=128,
+    parser.add_argument('--img_size', type=int, default=256,
                         help='Image resolution')
     parser.add_argument('--num_domains', type=int, default=4,
                         help='Number of domains')

@@ -129,7 +129,7 @@ class AdainResBlk(nn.Module):
 class Generator(nn.Module):
     def __init__(self, img_size=256, style_dim=64, max_conv_dim=512):
         super().__init__()
-        dim_in = 8
+        dim_in = 2
         self.img_size = img_size
         self.from_rgb = nn.Conv3d(1, dim_in, 3, 1, 1) 
         self.encode = nn.ModuleList()
@@ -213,7 +213,7 @@ class MappingNetwork(nn.Module):
 class StyleEncoder(nn.Module):
     def __init__(self, img_size=256, style_dim=64, num_domains=2, max_conv_dim=512):
         super().__init__()
-        dim_in = 2**8 // img_size
+        dim_in = 4
         blocks = []
         blocks += [nn.Conv3d(1, dim_in, 3, 1, 1)]
 
@@ -230,13 +230,13 @@ class StyleEncoder(nn.Module):
 
         self.unshared = nn.ModuleList()
         for _ in range(num_domains):
-            self.unshared += [nn.Linear(64, style_dim)] ### 864 was hardcoded, originally dim_out, varies as img size varies
+            self.unshared += [nn.Linear(256, style_dim)] ### 864 was hardcoded, originally dim_out, varies as img size varies
     def forward(self, x, y):
         h = self.shared(x)
         h = h.view(h.size(0), -1)
         out = []
         for layer in self.unshared:
-            # print(h.size())
+            print(h.size())
             out += [layer(h)]
         out = torch.stack(out, dim=1)  # (batch, num_domains, style_dim)
         idx = torch.LongTensor(range(y.size(0))).to(y.device)
