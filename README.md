@@ -1,1 +1,1 @@
-# 3DStarGAN
+# 2DStarGAN
